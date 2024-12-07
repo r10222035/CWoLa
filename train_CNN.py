@@ -95,27 +95,28 @@ def build_model(input_dim, n_class=3):
     return model
 
 
-def get_accuracy(y_true, y_pred):
+def get_accuracy(y_true, y_pred, permute=True):
 
-    # 定義映射規則 (以陣列形式表示)
-    mappings = np.array([
-        [0, 1, 2],  # 原始
-        [0, 2, 1],  # 0->0, 1->2, 2->1
-        [2, 1, 0],  # 0->2, 1->1, 2->0
-        [1, 0, 2],  # 0->1, 1->0, 2->2
-        [2, 0, 1],  # 0->2, 1->0, 2->1
-        [1, 2, 0],  # 0->1, 1->2, 2->0
-    ])
+    if permute:
+        # 定義映射規則 (以陣列形式表示)
+        mappings = np.array([
+            [0, 1, 2],  # 原始
+            [0, 2, 1],  # 0->0, 1->2, 2->1
+            [2, 1, 0],  # 0->2, 1->1, 2->0
+            [1, 0, 2],  # 0->1, 1->0, 2->2
+            [2, 0, 1],  # 0->2, 1->0, 2->1
+            [1, 2, 0],  # 0->1, 1->2, 2->0
+        ])
 
-    all_arrays = mappings[:, y_pred]
+        all_arrays = mappings[:, y_pred]
 
-    # evaluate ACC for all mappings
-    ACC = 0
-    for i, arr in enumerate(all_arrays):
-        ACC_tem = (y_true == arr).mean()
-        if ACC_tem > ACC:
-            ACC = ACC_tem
-            y_pred = arr
+        # evaluate ACC for all mappings
+        ACC = 0
+        for i, arr in enumerate(all_arrays):
+            ACC_tem = (y_true == arr).mean()
+            if ACC_tem > ACC:
+                ACC = ACC_tem
+                y_pred = arr
 
     ACC = (y_true == y_pred).mean()
     
@@ -169,7 +170,7 @@ def main():
 
     # evaluate accuracy for argmax
     y_test_predict = model.predict(X_test, batch_size=1024)
-    ACC_argmax, ACCs_argmax = get_accuracy(y_test.argmax(axis=1), y_test_predict.argmax(axis=1))
+    ACC_argmax, ACCs_argmax = get_accuracy(y_test.argmax(axis=1), y_test_predict.argmax(axis=1), permute=False)
     print(f'Argmax ACC: {ACC_argmax:.3f}, ACCs: {ACCs_argmax}')
 
     # evaluate accuracy for k-means
