@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Dense
 
 from sklearn.cluster import KMeans, SpectralClustering
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 # solve the problem of "libdevice not found at ./libdevice.10.bc"
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/home/r10222035/.conda/envs/tf2'
 
@@ -156,7 +156,7 @@ def main():
 
     # 建立模型並訓練
     model = build_model(X_train.shape[1])
-    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, verbose=1, patience=5)
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, verbose=1, patience=10)
     history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=200, batch_size=1024, verbose=1, callbacks=[early_stopping,])
 
 
@@ -201,8 +201,8 @@ def main():
                 'Training accuracy': [results_train[1]],
                 'Testing loss': [results_test[0]],
                 'Testing accuracy': [results_test[1]],
-                'Argmax ACC': [ACC_argmax],
-                'Argmax ACCs': [ACCs_argmax],
+                'Argmax: ACC': [ACC_argmax],
+                'Argmax: ACCs': [ACCs_argmax],
                 'K-means: ACC': [ACC_k_means],
                 'K-means: ACCs': [ACCs_k_means],
                 'Spectral: ACC': [ACC_spectral],
