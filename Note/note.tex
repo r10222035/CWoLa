@@ -111,7 +111,7 @@
     \label{sub:dataset_and_model_setup}
         We consider three pure samples, denoted by $A, B$, and $C$. The mixed datasets are denoted by $M_1, M_2$, and $M_3$. The training dataset is sampled from 5-dimensional normal distributions. The number of events in each mixed dataset is 10,000. The testing dataset consists of 1,000 pure samples for each class.
 
-        The neural network consists of two dense layers with eight hidden nodes. The loss function is categorical cross-entropy. To prevent over-training, we utilize the early stopping technique with a patience of 10. The output is a 3-dimensional vector, and each component can be interpreted as the probability belonging to each type.
+        The neural network consists of two dense layers with eight hidden nodes. The loss function is categorical cross-entropy. To prevent over-training, we utilize the early stopping technique with patience 10. The output is a 3-dimensional vector, and each component can be interpreted as the probability belonging to each type.
     % subsection dataset_and_model_setup (end)
     \subsection{Dominated case}% (fold)
     \label{sub:dominated_case}
@@ -213,7 +213,7 @@
 
         Figure~\ref{fig:event_score_distribution_ambiguous} shows scatter plots of the output vectors. While the testing accuracy is very low, different types of pure samples exhibit distinct distributions. This suggests that we need another method to interpret the output vector. 
 
-        Note that the accuracy for class $B$ is very low, while the accuracy for class $C$ is significantly higher. This suggests that when the classifier receives an event from either class $B$ or $C$, it tends to assign a high event score of type 3. This behavior is consistent with the fact that the pure samples $B$ and $C$ both are dominated in $M_3$. To improve performance, we need to refine our classification method or better interpret the output vectors.
+        Note that the accuracy for class $B$ is very low, while the accuracy for class $C$ is significantly higher. This suggests that when the classifier receives an event from either class $B$ or $C$, it tends to assign a high event score of type 3. This behavior is consistent with the fact that the pure samples $B$ and $C$ both are dominated in $M_3$. We need to refine our classification method or better interpret the output vectors to improve performance.
         \begin{figure}[htpb]
             \centering
             \subfloat[Training data]{
@@ -227,4 +227,39 @@
         \end{figure} 
     % subsection ambiguous_case (end)
 % section multi_class_cwola (end)
+\section{Output vector interpretation}% (fold)
+\label{sec:output_vector_interpretation}
+    In section~\ref{sec:multi_class_cwola}, the predicted label is determined from the output vector using the following method: if the first class has the highest probability, the sample is assigned to class $A$. The same logic applies to classes $B$ and $C$. We refer to this approach as the ``max argument'' method. 
+
+    While this interpretation works well for dominant cases, it performs poorly for ambiguous cases. However, for such cases, the output vector distributions still differ between pure classes, suggesting that we need a better prediction method. The clustering algorithms might provide an alternative way to determine the type of a given sample.
+
+    We consider the ambiguous cases described in section~\ref{sub:ambiguous_case} and test different clustering methods as alternative prediction strategies.
+
+    Figure~\ref{fig:event_score_distribution_w_prediction_ambiguous} presents the prediction results for various methods, where colors represent the predicted labels. Both clustering approaches show improvements in overall accuracy. Table~\ref{tab:accuracy_w_different_prediction_ambiguous} summarizes the mean and standard deviation of accuracies for each prediction method. Notably, both clustering methods significantly improve the accuracy for pure class $B$, contributing to the observed increase in total accuracy.
+   \begin{figure}[htpb]
+        \centering
+        \subfloat[Max-argument method]{
+            \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-maxarg.pdf}
+        } 
+        \subfloat[K-means clustering]{
+            \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-kmeans.pdf}
+        } \\
+        \subfloat[Spectral clustering]{
+            \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-spectral.pdf}
+        } 
+        \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The total accuracy and per-class accuracies are displayed.}
+        \label{fig:event_score_distribution_w_prediction_ambiguous}
+    \end{figure}
+    \begin{table}[htpb]
+        \centering
+        \caption{Accuracy of different prediction methods. The means and standard deviations are computed over ten training runs.}
+        \label{tab:accuracy_w_different_prediction_ambiguous}
+        \begin{tabular}{c|ccc|c}
+            Prediction Method   & $A$               & $B$               & $C$               & Total             \\ \hline
+            Max argument        & $0.742 \pm 0.035$ & $0.164 \pm 0.100$ & $0.707 \pm 0.091$ & $0.538 \pm 0.027$ \\
+            K-means clustering  & $0.868 \pm 0.028$ & $0.534 \pm 0.077$ & $0.595 \pm 0.050$ & $0.666 \pm 0.041$ \\
+            Spectral clustering & $0.823 \pm 0.114$ & $0.625 \pm 0.096$ & $0.656 \pm 0.173$ & $0.702 \pm 0.061$
+        \end{tabular}
+    \end{table}
+% section output_vector_interpretation (end)
 \end{document}
