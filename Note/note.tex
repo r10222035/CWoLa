@@ -233,33 +233,71 @@
 
     While this interpretation works well for dominant cases, it performs poorly for ambiguous cases. However, for such cases, the output vector distributions still differ between pure classes, suggesting that we need a better prediction method. The clustering algorithms might provide an alternative way to determine the type of a given sample.
 
-    We consider the ambiguous cases described in section~\ref{sub:ambiguous_case} and test different clustering methods as alternative prediction strategies.
+    \subsection{Ambiguous case}% (fold)
+    \label{sub:ambiguous_case}
+        We consider the ambiguous cases described in section~\ref{sub:ambiguous_case} and test different clustering methods as alternative prediction strategies.
 
-    Figure~\ref{fig:event_score_distribution_w_prediction_ambiguous} presents the prediction results for various methods, where colors represent the predicted labels. Both clustering approaches show improvements in overall accuracy. Table~\ref{tab:accuracy_w_different_prediction_ambiguous} summarizes the mean and standard deviation of accuracies for each prediction method. Notably, both clustering methods significantly improve the accuracy for pure class $B$, contributing to the observed increase in total accuracy.
-   \begin{figure}[htpb]
-        \centering
-        \subfloat[Max-argument method]{
-            \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-maxarg.pdf}
-        } 
-        \subfloat[K-means clustering]{
-            \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-kmeans.pdf}
-        } \\
-        \subfloat[Spectral clustering]{
-            \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-spectral.pdf}
-        } 
-        \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The total accuracy and per-class accuracies are displayed.}
-        \label{fig:event_score_distribution_w_prediction_ambiguous}
-    \end{figure}
-    \begin{table}[htpb]
-        \centering
-        \caption{Accuracy of different prediction methods. The means and standard deviations are computed over ten training runs.}
-        \label{tab:accuracy_w_different_prediction_ambiguous}
-        \begin{tabular}{c|ccc|c}
-            Prediction Method   & $A$               & $B$               & $C$               & Total             \\ \hline
-            Max argument        & $0.742 \pm 0.035$ & $0.164 \pm 0.100$ & $0.707 \pm 0.091$ & $0.538 \pm 0.027$ \\
-            K-means clustering  & $0.868 \pm 0.028$ & $0.534 \pm 0.077$ & $0.595 \pm 0.050$ & $0.666 \pm 0.041$ \\
-            Spectral clustering & $0.823 \pm 0.114$ & $0.625 \pm 0.096$ & $0.656 \pm 0.173$ & $0.702 \pm 0.061$
-        \end{tabular}
-    \end{table}
+        Figure~\ref{fig:event_score_distribution_w_prediction_ambiguous} presents the prediction results for various methods, where colors represent the predicted labels. Both clustering approaches show improvements in overall accuracy. Table~\ref{tab:accuracy_w_different_prediction_ambiguous} summarizes the mean and standard deviation of accuracies for each prediction method. Notably, both clustering methods significantly improve the accuracy for pure class $B$, contributing to the observed increase in total accuracy.
+       \begin{figure}[htpb]
+            \centering
+            \subfloat[Max argument method]{
+                \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-maxarg.pdf}
+            } 
+            \subfloat[K-means clustering]{
+                \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-kmeans.pdf}
+            } \\
+            \subfloat[Spectral clustering]{
+                \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-ambiguous-spectral.pdf}
+            } 
+            \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The total accuracy and per-class accuracies are displayed.}
+            \label{fig:event_score_distribution_w_prediction_ambiguous}
+        \end{figure}
+        \begin{table}[htpb]
+            \centering
+            \caption{Accuracy of different prediction methods. The means and standard deviations are computed over ten training runs.}
+            \label{tab:accuracy_w_different_prediction_ambiguous}
+            \begin{tabular}{c|ccc|c}
+                Prediction Method   & $A$               & $B$               & $C$               & Total             \\ \hline
+                Max argument        & $0.742 \pm 0.035$ & $0.164 \pm 0.100$ & $0.707 \pm 0.091$ & $0.538 \pm 0.027$ \\
+                K-means clustering  & $0.868 \pm 0.028$ & $0.534 \pm 0.077$ & $0.595 \pm 0.050$ & $0.666 \pm 0.041$ \\
+                Spectral clustering & $0.823 \pm 0.114$ & $0.625 \pm 0.096$ & $0.656 \pm 0.173$ & $0.702 \pm 0.061$
+            \end{tabular}
+        \end{table}
+    % subsection ambiguous_case (end)
+    \subsection{Dominant Case}  
+    \label{sub:dominated_case}  
+        We consider the dominant case described in table~\ref{tab:type_fraction_dominated_1} using different clustering methods as alternative prediction strategies.  
+
+        Figure~\ref{fig:event_score_distribution_w_prediction_dominated_1} shows the prediction results for various methods. The three prediction methods exhibit similar performance. Since the max argument method already performs well, there is limited room for improvement.  
+
+        Table~\ref{tab:accuracy_w_different_prediction_dominated_1} summarizes the mean and standard deviation of accuracies. While spectral clustering achieves better accuracy for class $A$, it performs worse for class $B$, resulting in a total accuracy that is approximately 2\% lower compared to the other prediction methods.  
+
+        \begin{figure}[htpb]
+            \centering
+            \subfloat[Max argument method]{  
+                \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-dominated_1-maxarg.pdf}  
+            }  
+            \subfloat[K-means clustering]{  
+                \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-dominated_1-kmeans.pdf}  
+            } \\  
+            \subfloat[Spectral clustering]{  
+                \includegraphics[width=0.47\textwidth]{multi-class_testing_data_predict-dominated_1-spectral.pdf}  
+            }  
+            \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The black solid line represents the event score boundary. Total accuracy and per-class accuracies are displayed.}  
+            \label{fig:event_score_distribution_w_prediction_dominated_1}  
+        \end{figure}  
+
+        \begin{table}[htpb]  
+            \centering  
+            \caption{Accuracy of different prediction methods. Means and standard deviations are computed over ten training runs.}  
+            \label{tab:accuracy_w_different_prediction_dominated_1}  
+            \begin{tabular}{c|ccc|c}  
+                Prediction Method   & $A$               & $B$               & $C$               & Total             \\ \hline  
+                Max argument        & $0.755 \pm 0.040$ & $0.824 \pm 0.025$ & $0.884 \pm 0.021$ & $0.821 \pm 0.003$ \\  
+                K-means clustering  & $0.784 \pm 0.020$ & $0.828 \pm 0.017$ & $0.857 \pm 0.017$ & $0.823 \pm 0.003$ \\  
+                Spectral clustering & $0.813 \pm 0.029$ & $0.746 \pm 0.019$ & $0.864 \pm 0.019$ & $0.807 \pm 0.005$  
+            \end{tabular}  
+        \end{table}  
+    % subsection dominated_case (end)
 % section output_vector_interpretation (end)
 \end{document}
