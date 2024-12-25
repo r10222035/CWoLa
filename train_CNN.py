@@ -22,21 +22,22 @@ covB = np.eye(5)
 muC = [-1, -1, -1, -1, -1]
 covC = np.eye(5)
 
-# # dominated case 1
-# f1A, f1B, f1C = 0.7, 0.2, 0.1
-# f2A, f2B, f2C = 0.1, 0.7, 0.2
-# f3A, f3B, f3C = 0.2, 0.1, 0.7
+# dominated case 1
+case_name = 'Dominated 1'
+f1A, f1B, f1C = 0.7, 0.2, 0.1
+f2A, f2B, f2C = 0.1, 0.7, 0.2
+f3A, f3B, f3C = 0.2, 0.1, 0.7
 
 # # dominated case 2
 # f1A, f1B, f1C = 0.80, 0.10, 0.10
 # f2A, f2B, f2C = 0.70, 0.25, 0.05
 # f3A, f3B, f3C = 0.60, 0.20, 0.20
 
-# ambiguous case
-case_name = 'Ambiguous'
-f1A, f1B, f1C = 0.80, 0.10, 0.10
-f2A, f2B, f2C = 0.70, 0.20, 0.10
-f3A, f3B, f3C = 0.60, 0.25, 0.15
+# # ambiguous case
+# case_name = 'Ambiguous'
+# f1A, f1B, f1C = 0.80, 0.10, 0.10
+# f2A, f2B, f2C = 0.70, 0.20, 0.10
+# f3A, f3B, f3C = 0.60, 0.25, 0.15
 
 # set random seed
 np.random.seed(24)
