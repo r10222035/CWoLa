@@ -300,4 +300,70 @@
         \end{table}  
     % subsection dominated_case (end)
 % section output_vector_interpretation (end)
+\section{Differences between training and testing sets}% (fold)
+\label{sec:differences_between_training_and_testing_sets}
+    In real applications, we only have training datasets and cannot obtain the true labels of the samples. Therefore, it is crucial to ensure that the performance of the training and testing datasets is similar, allowing prediction workflows to be effectively applied back to the training sets.
+
+    \subsection{Dominant Case}% (fold)
+    \label{sub:dominated_case_train_test_comparison}
+        For the dominant case described in table~\ref{tab:type_fraction_dominated_1}, we evaluate different clustering methods as alternative prediction strategies.  
+
+        Figure~\ref{fig:event_score_distribution_w_prediction_dominated_1_train_test_comparison} presents the prediction results for both training and testing datasets. The performance is consistent across the two datasets, with similar results for all three prediction methods. These findings are also consistent with the results discussed in section~\ref{sub:dominated_case} and demonstrate that the clustering prediction strategy can be effectively applied to training datasets.
+        \begin{figure}[htpb]
+            \centering
+            \subfloat[Training sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-dominated_1-maxarg.pdf}  
+            }  
+            \subfloat[Testing sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-dominated_1-maxarg.pdf}  
+            } \\  
+            \subfloat[Training sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-dominated_1-kmeans.pdf}  
+            }  
+            \subfloat[Testing sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-dominated_1-kmeans.pdf}  
+            } \\  
+            \subfloat[Training sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-dominated_1-spectral.pdf}  
+            }  
+            \subfloat[Testing sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-dominated_1-spectral.pdf}  
+            }
+            \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The black solid line represents the event score boundary. Total accuracy and per-class accuracies are displayed.}  
+            \label{fig:event_score_distribution_w_prediction_dominated_1_train_test_comparison}  
+        \end{figure}  
+    % subsection dominated_case_train_test_comparison (end)
+    \subsection{Ambiguous Case}% (fold)
+    \label{sub:ambiguous_case_train_test_comparison}
+        We consider the ambiguous case described in table~\ref{tab:type_fraction_ambiguous} using different clustering methods as alternative prediction strategies.  
+
+        Figure~\ref{fig:event_score_distribution_w_prediction_ambiguous_train_test_comparison} compares the prediction results for training and testing datasets. The training sets exhibit better performance for the Max-argument and K-means methods, whereas spectral clustering performs worse. The performance depends on the prediction method used.  
+
+        Since the classifiers have been exposed to the training datasets, the training sample distribution should be more well-separated compared with the testing set. This could be the reason why the Max-argument and K-means methods have greater ACC on the training set. However, the poorer performance of spectral clustering on training sets is less clear, and we should explore it.
+        \begin{figure}[htpb]
+            \centering
+            \subfloat[Training sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-ambiguous-maxarg.pdf}  
+            }  
+            \subfloat[Testing sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-ambiguous-maxarg.pdf}  
+            } \\  
+            \subfloat[Training sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-ambiguous-kmeans.pdf}  
+            }  
+            \subfloat[Testing sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-ambiguous-kmeans.pdf}  
+            } \\  
+            \subfloat[Training sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-ambiguous-spectral.pdf}  
+            }  
+            \subfloat[Testing sets]{  
+                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-ambiguous-spectral.pdf}  
+            }
+            \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The black solid line represents the event score boundary. Total accuracy and per-class accuracies are displayed.}  
+            \label{fig:event_score_distribution_w_prediction_ambiguous_train_test_comparison}  
+        \end{figure}
+    % subsection ambiguous_case_train_test_comparison (end)
+% section differences_between_training_and_testing_sets (end)
+
 \end{document}
