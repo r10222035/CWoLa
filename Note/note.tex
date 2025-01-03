@@ -109,7 +109,7 @@
 
     \subsection{Dataset and model setup}% (fold)
     \label{sub:dataset_and_model_setup}
-        We consider three pure samples, denoted by $A, B$, and $C$. The mixed datasets are denoted by $M_1, M_2$, and $M_3$. The training dataset is sampled from 5-dimensional normal distributions. The number of events in each mixed dataset is 10,000. The testing dataset consists of 1,000 pure samples for each class.
+        We consider three pure samples, denoted by $A, B$, and $C$. The mixed datasets are denoted by $M_1, M_2$, and $M_3$. The training dataset is sampled from 5-dimensional normal distributions. Each mixed dataset has 10,000 events. The testing dataset consists of 1,000 pure samples for each class.
 
         The neural network consists of two dense layers with eight hidden nodes. The loss function is categorical cross-entropy. To prevent over-training, we utilize the early stopping technique with patience 10. The output is a 3-dimensional vector, and each component can be interpreted as the probability belonging to each type.
     % subsection dataset_and_model_setup (end)
@@ -312,22 +312,22 @@
         \begin{figure}[htpb]
             \centering
             \subfloat[Training sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-dominated_1-maxarg.pdf}  
+                \includegraphics[width=0.38\textwidth]{multi-class_training_data_predict-dominated_1-maxarg.pdf}  
             }  
             \subfloat[Testing sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-dominated_1-maxarg.pdf}  
+                \includegraphics[width=0.38\textwidth]{multi-class_testing_data_predict-dominated_1-maxarg.pdf}  
             } \\  
             \subfloat[Training sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-dominated_1-kmeans.pdf}  
+                \includegraphics[width=0.38\textwidth]{multi-class_training_data_predict-dominated_1-kmeans.pdf}  
             }  
             \subfloat[Testing sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-dominated_1-kmeans.pdf}  
+                \includegraphics[width=0.38\textwidth]{multi-class_testing_data_predict-dominated_1-kmeans.pdf}  
             } \\  
             \subfloat[Training sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-dominated_1-spectral.pdf}  
+                \includegraphics[width=0.38\textwidth]{multi-class_training_data_predict-dominated_1-spectral.pdf}  
             }  
             \subfloat[Testing sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-dominated_1-spectral.pdf}  
+                \includegraphics[width=0.38\textwidth]{multi-class_testing_data_predict-dominated_1-spectral.pdf}  
             }
             \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The black solid line represents the event score boundary. Total accuracy and per-class accuracies are displayed.}  
             \label{fig:event_score_distribution_w_prediction_dominated_1_train_test_comparison}  
@@ -343,27 +343,56 @@
         \begin{figure}[htpb]
             \centering
             \subfloat[Training sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-ambiguous-maxarg.pdf}  
+                \includegraphics[width=0.39\textwidth]{multi-class_training_data_predict-ambiguous-maxarg.pdf}  
             }  
             \subfloat[Testing sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-ambiguous-maxarg.pdf}  
+                \includegraphics[width=0.39\textwidth]{multi-class_testing_data_predict-ambiguous-maxarg.pdf}  
             } \\  
             \subfloat[Training sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-ambiguous-kmeans.pdf}  
+                \includegraphics[width=0.39\textwidth]{multi-class_training_data_predict-ambiguous-kmeans.pdf}  
             }  
             \subfloat[Testing sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-ambiguous-kmeans.pdf}  
+                \includegraphics[width=0.39\textwidth]{multi-class_testing_data_predict-ambiguous-kmeans.pdf}  
             } \\  
             \subfloat[Training sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_training_data_predict-ambiguous-spectral.pdf}  
+                \includegraphics[width=0.39\textwidth]{multi-class_training_data_predict-ambiguous-spectral.pdf}  
             }  
             \subfloat[Testing sets]{  
-                \includegraphics[width=0.40\textwidth]{multi-class_testing_data_predict-ambiguous-spectral.pdf}  
+                \includegraphics[width=0.39\textwidth]{multi-class_testing_data_predict-ambiguous-spectral.pdf}  
             }
             \caption{Event score distribution with prediction results. The grey dashed lines indicate regions corresponding to different predicted labels using the max argument method. The black solid line represents the event score boundary. Total accuracy and per-class accuracies are displayed.}  
             \label{fig:event_score_distribution_w_prediction_ambiguous_train_test_comparison}  
         \end{figure}
     % subsection ambiguous_case_train_test_comparison (end)
 % section differences_between_training_and_testing_sets (end)
+\section{Prediction Dependency Issue}  
+\label{sec:prediction_dependency_issue}  
 
+	When using clustering methods as alternative prediction strategies, the prediction results depend on the entire dataset, as the clustering process requires all samples to make predictions. To predict an event, we need to access the entire dataset.
+
+	To address this prediction dependency issue, we propose training an additional neural network using the sample labels obtained from clustering-based predictions. This new neural network combines the functionalities of the CWoLa classifier (assigning event scores) and clustering-based prediction (final classification).
+
+	The workflow consists of three steps:  
+	\begin{enumerate}
+		\item Train the initial neural network following the setup described in section~\ref{sub:dataset_and_model_setup}.  
+		\item Apply a clustering prediction method to the training dataset to generate new labels.  
+		\item Train a second neural network using the relabeled training dataset.  
+	\end{enumerate}
+	This second neural network should reproduce the performance of the original neural network combined with clustering-based prediction.  
+
+	Table~\ref{tab:accuracy_w_different_prediction_dominated_1_combined_nn} summarizes the results for various prediction methods. ``K-means NN'' refers to the second neural network trained on K-means clustering labels. The results demonstrate that this approach performs similarly to directly applying clustering-based prediction on the original neural network. This finding suggests that a secondary neural network can effectively integrate the functionalities of a neural network and clustering-based prediction, removing the dependency on the entire dataset for predictions.  
+	\begin{table}[htpb]  
+		\centering  
+		\caption{Accuracy of different prediction methods evaluated on the testing dataset. Means and standard deviations are calculated over ten training runs.}  
+		\label{tab:accuracy_w_different_prediction_dominated_1_combined_nn}  
+		\begin{tabular}{l|ccc|c}  
+			Prediction Method   & $A$               & $B$               & $C$               & Total             \\ \hline  
+			Max argument        & $0.751 \pm 0.027$ & $0.831 \pm 0.022$ & $0.884 \pm 0.017$ & $0.822 \pm 0.003$ \\  
+			K-means clustering  & $0.782 \pm 0.015$ & $0.830 \pm 0.016$ & $0.856 \pm 0.018$ & $0.823 \pm 0.003$ \\  
+			K-means NN          & $0.781 \pm 0.014$ & $0.831 \pm 0.018$ & $0.856 \pm 0.020$ & $0.823 \pm 0.003$ \\  
+			Spectral clustering & $0.811 \pm 0.029$ & $0.768 \pm 0.026$ & $0.850 \pm 0.045$ & $0.810 \pm 0.007$ \\  
+			Spectral NN         & $0.804 \pm 0.027$ & $0.762 \pm 0.025$ & $0.863 \pm 0.027$ & $0.810 \pm 0.005$  
+		\end{tabular}  
+	\end{table}  
+% section prediction_dependency_issue (end)
 \end{document}
