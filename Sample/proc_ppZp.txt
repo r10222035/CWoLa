@@ -1,0 +1,16 @@
+import model HAHM_variableMW_v5_UFO
+generate p p > zp > w+ w-, (w+ > l+ vl), (w- > l- vl~)
+output ppZp
+launch ppZp
+
+shower=Pythia8
+detector=Delphes
+analysis=OFF
+madspin=OFF
+done
+
+set run_card nevents 10000
+set run_card ebeam1 6500.0
+set run_card ebeam2 6500.0
+
+done

@@ -1,0 +1,15 @@
+generate p p > z z, (z > l+ l-), (z > vl vl~)
+output ppZZ
+launch ppZZ
+
+shower=Pythia8
+detector=Delphes
+analysis=OFF
+madspin=OFF
+done
+
+set run_card nevents 10000
+set run_card ebeam1 6500.0
+set run_card ebeam2 6500.0
+
+done

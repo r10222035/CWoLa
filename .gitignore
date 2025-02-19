@@ -8,4 +8,13 @@
 *.bbl 
 *.blg 
 
+__pycache__/
+
+/Reference
+*_models/
+config_files/
 *.sh
+Sample/ppZp/
+Sample/ppWpWm/
+Sample/ppZZ/
+Sample/data/
