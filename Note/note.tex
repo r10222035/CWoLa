@@ -63,8 +63,15 @@
 \usepackage{graphicx}
 \usepackage{subfig}
 %
-\graphicspath{{figures/}{../figures/}}
+\graphicspath{{../figures/}}
 
+\usepackage{listings}
+\usepackage{lstautogobble}
+\lstset{
+    basicstyle=\ttfamily,
+    columns=fullflexible,
+    autogobble=true,
+}
 
 %
 \usepackage{indentfirst}
@@ -87,7 +94,7 @@
 \label{sec:bootstrapping}
     The bootstrapping method involves an iterative process of training a classifier on mixed datasets. We start by training a classifier on the initial mixed datasets. The trained classifier is then used to reclassify the data, creating a new mixed training set. This process is repeated multiple times to increase the sample fraction differences in mixed datasets. We want to explore whether this process can improve CWoLa's performance.
     
-    We consider the events sampled from the normal distribution for the testing and implement this method. We found this method is unsuccessful. The model initially achieved the best performance, then worsened at subsequent iterations.
+    We implemented this method, considering the events sampled from the normal distribution for the testing. We found it unsuccessful. The model initially achieved the best performance, then worsened at subsequent iterations.
 
     The reason is the reclassification step breaks the key assumption of the CWoLa approach: the signal and background events should have the same distributions in both mixed datasets. Figure~\ref{fig:bootstrapping_signal_background_distribution_origin} shows the initial signal and background distributions. Signal has the same distribution in mixed dataset $M_1$ and $M_2$, as does the background. Figure~\ref{fig:bootstrapping_signal_background_distribution_iteration_1} shows signal and background distributions after the reclassification. We could observe the signal events have different distributions in $M_1$ and $M_2$. As a result, the assumption of the CWoLa approach is violated, leading to the failure of the bootstrapping method.
     \begin{figure}[htpb]
@@ -395,4 +402,166 @@
 		\end{tabular}  
 	\end{table}  
 % section prediction_dependency_issue (end)
+\section{Physics process}% (fold)
+\label{sec:physics_process}
+    \subsection{Monte Carlo sample generation}% (fold)
+    \label{sub:monte_carlo_sample_generation}
+        We consider the following physics processes:  
+        \begin{enumerate}
+            \item The $Z'$ model process:
+                \[
+                    p p \to Z' \to W^{+}W^{-} \to \ell^{+} \nu_{\ell} \ell^{-}\overline{\nu}_{\ell}
+                \] 
+            \item SM process, $W^{+}W^{-}$ production:
+                \[
+                    p p \to W^{+}W^{-} \to \ell^{+}\nu_{\ell} \ell^{-}\overline{\nu}_{\ell}
+                \]
+            \item SM process, $ZZ$ production:
+                \[
+                    p p \to Z Z \to \ell^{+}\ell^{-} \nu_{\ell} \overline{\nu}_{\ell}
+                \] 
+        \end{enumerate}
+        They all have the same final state. Thus, distinguishing these three production processes could be a real application of multi-class CWoLa.
+
+        We adopt the $Z'$ model from this \href{http://feynrules.irmp.ucl.ac.be/wiki/HAHM#no1}{page}~\cite{Curtin:2013fra, Curtin:2014cca}. 
+
+        We use \verb|MadGraph 3.3.1|~\cite{Alwall:2014hca} to generate these processes at a center-of-mass energy of $\sqrt{s} = 13$ TeV. The parton showering and hadronization are simulated using \verb|Pythia 8.306|~\cite{Sjostrand:2014zea}. The detector simulation is conducted by \verb|Delphes 3.4.2|~\cite{deFavereau:2013fsa}. Jet reconstruction is performed using \verb|FastJet 3.3.2|~\cite{Cacciari:2011ma} with the anti-$k_t$ algorithm~\cite{Cacciari:2008gp} and a jet radius of $R = 0.5$. These jets are required to have transverse momentum $p_{\text{T}} > 20$ GeV. We keep all settings as their default values for now.
+
+        The following \verb|MadGraph| scripts generate Monte Carlo samples for each process.
+
+        \paragraph{$Z'$ production}
+        \begin{lstlisting}
+            import model HAHM_variableMW_v5_UFO
+            generate p p > zp > w+ w-, (w+ > l+ vl), (w- > l- vl~)
+            output ppZp
+            launch ppZp
+
+            shower=Pythia8
+            detector=Delphes
+            analysis=OFF
+            madspin=OFF
+            done
+
+            set run_card nevents 10000
+            set run_card ebeam1 6500.0
+            set run_card ebeam2 6500.0
+
+            done
+        \end{lstlisting}
+        \paragraph{$W^{+}W^{-}$ production}
+        \begin{lstlisting}
+            generate p p > w+ w-, (w+ > l+ vl), (w- > l- vl~)
+            output ppWpWm
+            launch ppWpWm
+
+            shower=Pythia8
+            detector=Delphes
+            analysis=OFF
+            madspin=OFF
+            done
+
+            set run_card nevents 10000
+            set run_card ebeam1 6500.0
+            set run_card ebeam2 6500.0
+
+            done
+        \end{lstlisting}
+        \paragraph{$ZZ$ production}
+        \begin{lstlisting}
+            generate p p > z z, (z > l+ l-), (z > vl vl~)
+            output ppZZ
+            launch ppZZ
+
+            shower=Pythia8
+            detector=Delphes
+            analysis=OFF
+            madspin=OFF
+            done
+
+            set run_card nevents 10000
+            set run_card ebeam1 6500.0
+            set run_card ebeam2 6500.0
+
+            done
+        \end{lstlisting}
+    % subsection monte_carlo_sample_generation (end)
+    \subsection{Event selection}% (fold)
+    \label{sub:event_selection}
+        The selection cuts after the \verb|Delphes| simulation:
+        \begin{itemize}
+            \item $n_{l}$ cut: The number of leptons (electron + muon) should be at least 2.
+        \end{itemize}
+
+        % Table~\ref{tab:GGF_VBF_Higgs_cutflow_number} summarizes the cutflow number at different selection cuts.
+        % \begin{table}[htpb]
+        %     \centering
+        %     \caption{Number of passing events and passing rates for GGF and VBF Higgs production at different selection cuts.}
+        %     \label{tab:GGF_VBF_Higgs_cutflow_number}
+        %     \begin{tabular}{l|rr|rr}
+        %         Cut                    & GGF    & pass rate & VBF    & pass rate \\ \hline
+        %         Total                  & 100000 & 1         & 100000 & 1         \\
+        %         $n_{\gamma}$ cut       & 48286  & 0.48      & 53087  & 0.53      \\
+        %         $n_j$ cut              & 9302   & 0.09      & 42860  & 0.43      \\
+        %         $m_{\gamma\gamma}$ cut & 8864   & 0.09      & 40694  & 0.41     
+        %     \end{tabular}
+        % \end{table}
+        
+        Figure~\ref{fig:mll_distribution} shows the distributions of $m_{ll}$ (the invariant mass of the two leading leptons).
+        \begin{figure}[htpb]
+            \centering
+            \subfloat[$m_{ll}$ distribution]{
+                \includegraphics[width=0.60\textwidth]{mll_distribution.pdf}
+            }
+            \caption{Distributions of the invariant mass $m_{ll}$ of the two leading leptons.}
+            \label{fig:mll_distribution}
+        \end{figure}
+    % subsection event_selection (end)
+    \subsection{Event image}% (fold)
+    \label{sub:event_image}
+        The inputs for the neural networks are event images~\cite{Kasieczka:2019dbj,deOliveira:2015xxd, Kasieczka2017nv}. These images are constructed from events that pass the kinematic selection criteria described in section~\ref{sub:event_selection}. Each event image has three channels corresponding to calorimeter towers, track, and leptons. The following preprocessing steps are applied to all event constituents:
+        \begin{enumerate}
+            \item Translation: Compute the $p_{\text{T}}$-weighted center in the $\phi$ coordinates, then shift this point to the origin.
+            \item Flipping: Flip the highest $p_{\text{T}}$ quadrant to the first quadrant.
+            \item Pixelation: Pixelate in a $\eta \in [-5, 5],\ \phi \in [-\pi, \pi]$ box, with $40 \times 40$ pixels 
+        \end{enumerate}
+
+        Figure~\ref{fig:Zp_WW_ZZ_event_image} shows the event images for three different physics processes.
+        \begin{figure}[htpb]
+            \centering
+            \subfloat[$Z'$: Calorimeter Tower]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppZp-tower.pdf}
+            }
+            \subfloat[$W^+W^-$: Calorimeter Tower]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppWW-tower.pdf}
+            }
+            \subfloat[$ZZ$: Calorimeter Tower]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppZZ-tower.pdf}
+            } \\
+            \subfloat[$Z'$: Track]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppZp-track.pdf}
+            }
+            \subfloat[$W^+W^-$: Track]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppWW-track.pdf}
+            }
+            \subfloat[$ZZ$: Track]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppZZ-track.pdf}
+            } \\
+            \subfloat[$Z'$: Lepton]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppZp-lepton.pdf}
+            }
+            \subfloat[$W^+W^-$: Lepton]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppWW-lepton.pdf}
+            }
+            \subfloat[$ZZ$: Lepton]{
+                \includegraphics[width=0.31\textwidth]{event_image_ppZZ-lepton.pdf}
+            }
+            \caption{Event images for $Z', W^{+}W^{-}$, and $ZZ$ channel, separately shown for calorimeter towers, tracks, and leptons.}
+            \label{fig:Zp_WW_ZZ_event_image}
+        \end{figure}
+    % subsection event_image (end)
+% section physics_process (end)
+
+\bibliographystyle{ieeetr}
+\bibliography{reference}
+
 \end{document}
